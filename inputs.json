@@ -1,0 +1,12 @@
+{
+    "tokens": [
+        "se",
+        "entao",
+        "senao"
+    ],
+    "grammars": [
+        "<S> ::= a<A> | e<A> | i<A> | o<A> | u<A>",
+        "<A> ::= a<A> | e<A> | i<B> | o<A> | u<A> ",
+        "<B> ::= i<A> | e<S> | ε"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@biridiz/finite-automata",
+  "version": "1.0.0",
+  "description": "Application for construction and determination of finite automata",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "Luiz Roberto Dendena",
+  "license": "ISC"
+}
