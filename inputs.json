@@ -5,8 +5,8 @@
         "senao"
     ],
     "grammars": [
-        "<S> ::= a<A> | e<A> | i<A> | o<A> | u<A>",
-        "<A> ::= a<A> | e<A> | i<B> | o<A> | u<A> ",
+        "<S> ::= a<A> | b<A> | i<A> | o<A> | u<A>",
+        "<A> ::= a<A> | b<A> | i<B> | o<A> | u<A> ",
         "<B> ::= i<A> | e<S> | ε"
     ]
 }

@@ -51,45 +51,56 @@ const Grammars = () => {
         for (let item=0; item<grammarArray[line].length; item++) {
             if (grammarArray[line][item].includes(MAJOR)) {
                 const [ state, first ] = grammarArray[line][item].split(MAJOR);
-                const [ value, nextState ] = first.split('');
-                let firstStateOfLine;
-                if (state === INITIAL_STATE) {
-                    firstStateOfLine = state;
+                let [ value, nextState ] = first.split('');
+                if (value == 'ε') {
+                    grammarArray[line][item] = value + '*';
 
-                } else if (state !== INITIAL_STATE) {
-                    states[state] = stateTokens[states.index];
-                    firstStateOfLine = stateTokens[states.index];
-                    states.index++;       
-                }
-                if (Object.keys(states).includes(state)) {
-                    firstStateOfLine = states[state];
-                }
-
-                if (Object.keys(states).includes(nextState)) {
-                    grammarArray[line][item] = firstStateOfLine + MAJOR + value + states[nextState];
-
-                } else if (nextState !== INITIAL_STATE) {
-                    grammarArray[line][item] = firstStateOfLine + MAJOR + value + stateTokens[states.index];
-                    states[state] = stateTokens[states.index];
-
-                } else if (nextState === INITIAL_STATE) {
-                    grammarArray[line][item] = firstStateOfLine + MAJOR + value + INITIAL_STATE;
-                    states[state] = stateTokens[states.index];
+                } else {
+                    let firstStateOfLine;
+                    if (state === INITIAL_STATE) {
+                        firstStateOfLine = state;
+    
+                    } else if (state !== INITIAL_STATE) {
+                        states[state] = stateTokens[states.index];
+                        firstStateOfLine = stateTokens[states.index];
+                        states.index++;       
+                    }
+                    if (Object.keys(states).includes(state)) {
+                        firstStateOfLine = states[state];
+                    }
+    
+                    if (Object.keys(states).includes(nextState)) {
+                        grammarArray[line][item] = firstStateOfLine + MAJOR + value + states[nextState];
+    
+                    } else if (nextState !== INITIAL_STATE) {
+                        grammarArray[line][item] = firstStateOfLine + MAJOR + value + stateTokens[states.index];
+                        states[state] = stateTokens[states.index];
+    
+                    } else if (nextState === INITIAL_STATE) {
+                        grammarArray[line][item] = firstStateOfLine + MAJOR + value + INITIAL_STATE;
+                        states[state] = stateTokens[states.index];
+                    }
                 }
 
             } else {
-                const [ value, state ] = grammarArray[line][item].split('');
-                if (Object.keys(states).includes(state)) {
-                    grammarArray[line][item] = value + states[state];
+                let [ value, state ] = grammarArray[line][item].split('');
+                if (value == 'ε') {
+                    grammarArray[line][item] = value + '*';
 
-                } else if (state !== INITIAL_STATE) {
-                    grammarArray[line][item] = value + stateTokens[states.index];
-                    states[state] = stateTokens[states.index];
+                } else {
+                    if (Object.keys(states).includes(state)) {
+                        grammarArray[line][item] = value + states[state];
+    
+                    } else if (state !== INITIAL_STATE) {
+                        grammarArray[line][item] = value + stateTokens[states.index];
+                        states[state] = stateTokens[states.index];
+                    }
+                    if (state === INITIAL_STATE) {
+                        grammarArray[line][item] = value + INITIAL_STATE;
+                        states[state] = stateTokens[states.index];
+                    }
                 }
-                if (state === INITIAL_STATE) {
-                    grammarArray[line][item] = value + INITIAL_STATE;
-                    states[state] = stateTokens[states.index];
-                }
+                
             }
         }
         for (let column=0; column<grammarArray[line].length; column++) {
@@ -112,18 +123,25 @@ const Determination = () => {
     let cont = 0;
     let newStates = [];
     let deleteKeys = [];
+    let supersededStates = [];
 
     for (let i = 0; i<finiteAutomata.length; i++) {
         for (let j = 0; j<finiteAutomata.length; j++) {
             if (Object.keys(finiteAutomata[i])[0] == Object.keys(finiteAutomata[j])[0]) {
                 if (cont > 0) {
                     if (Object.values(finiteAutomata[i])[0] != Object.values(finiteAutomata[j])[0]) {
+                        const obj = {
+                            newTransition: stateTokens[states.index],
+                            states: [Object.values(finiteAutomata[i])[0], Object.values(finiteAutomata[j])[0]]
+                        }
+                        supersededStates.push(obj);
                         newStates.push({ [`${Object.keys(finiteAutomata[i])[0]}`]: stateTokens[states.index] });
                     }
                     deleteKeys.push(Object.keys(finiteAutomata[i])[0]);
                     states.index++;
                 }
-                cont++;            
+                cont++;   
+
             }
         }
         cont = 0;
@@ -140,6 +158,19 @@ const Determination = () => {
     if (newStates.length > 0) {
         for (let newState of newStates) {
             finiteAutomata.push(newState);
+        }
+    }
+    if (supersededStates.length > 0) {
+        for (let supersededState of supersededStates) {
+            for (let i = 0; i<finiteAutomata.length; i++) {
+                for (let state of supersededState.states) {
+                    if (Object.keys(finiteAutomata[i])[0].includes(state)) {
+                        let newTransition = Object.keys(finiteAutomata[i])[0].replace(state, supersededState.newTransition);
+                        finiteAutomata[i] = { [newTransition]: Object.values(finiteAutomata[i])[0] };
+                    }
+                }
+                
+            }
         }
     }
 }
