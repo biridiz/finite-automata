@@ -140,8 +140,7 @@ const Determination = () => {
                     deleteKeys.push(Object.keys(finiteAutomata[i])[0]);
                     states.index++;
                 }
-                cont++;   
-
+                cont++;
             }
         }
         cont = 0;
